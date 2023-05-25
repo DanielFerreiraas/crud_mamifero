@@ -37,15 +37,19 @@ server.get('/inserir/:nome', async (request, reply) => {
     });
     reply.send(mamifero);
 });
-server.get('/buscar/:nome', async (req, reply) => {
-    let nome = req.params.nome;
-    let mamifero = await prisma.leopardoDasNeves.findMany({
+server.get('/pesquisar/:nome', async (request, reply) => {
+    const nome = request.params.nome;
+    const mamifero = await prisma.leopardoDasNeves.findMany({
         where: {
             nome: {
                 contains: nome
             }
         }
     });
+    reply.send(mamifero);
+});
+server.get('/pesquisar/tudo', async (request, reply) => {
+    const mamifero = await prisma.leopardoDasNeves.findMany();
     reply.send(mamifero);
 });
 const port = process.env.PORT;

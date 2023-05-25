@@ -13,7 +13,7 @@ server.register(cors, {
 });
 
 server.get('/', (request, reply) => {
-    return "Servidor Exemplo no ar"
+    return "O servidor está funcionado com sucesso!";
 });
 
 interface Mamifero {
@@ -23,44 +23,37 @@ interface Mamifero {
     ameacado: boolean;
 }
 
-server.post<{ Body: Mamifero }>('/inserir', async (request, reply) => {
-    const { nome, caracteristicas, peso, ameacado } = request.body;
+    server.post<{ Body: Mamifero }>('/inserir', async (request, reply) => {
+        
+        const { nome, caracteristicas, peso, ameacado } = request.body;
 
-    const mamifero = await prisma.leopardoDasNeves.create({
-        data: {
-            nome,
-            caracteristicas,
-            peso,
-            ameacado,
-        }
-    });
-    return reply.status(201).send(mamifero);
-});
-
-server.get<{ Body: Mamifero }>('/inserir/:nome', async (request, reply) => {
-    const { nome } = request.body;
-
-    const mamifero = await prisma.leopardoDasNeves.findMany({
-        where: {
-            nome: {
-              contains: nome
+        const mamifero = await prisma.leopardoDasNeves.create({
+            data: {
+                nome,
+                caracteristicas,
+                peso,
+                ameacado,
             }
-          }
-        })
-        reply.send(mamifero)
+        });
+        return reply.status(201).send(mamifero);
     });
 
-    server.get('/buscar/:nome', async(req: any, reply : any) => {
-        let nome = req.params.nome
-        let mamifero = await prisma.leopardoDasNeves.findMany({
+    server.get('/pesquisar/:nome', async(request: any, reply : any) => {
+        const nome = request.params.nome;
+        const mamifero = await prisma.leopardoDasNeves.findMany({
           where: {
             nome: {
               contains: nome
             }
           }
-        })
-        reply.send(mamifero)
-      })
+        });
+        reply.status(200).send(mamifero)
+      });
+
+      server.get('/pesquisar/todos', async(request, reply) => {
+        const mamifero = await prisma.leopardoDasNeves.findMany()
+        reply.status(200).send(mamifero)
+      });
 
 const port: any = process.env.PORT;
 
