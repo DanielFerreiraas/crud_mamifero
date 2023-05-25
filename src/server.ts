@@ -17,16 +17,16 @@ server.get('/', (request, reply) => {
 });
 
 interface Mamifero {
-    nome: String;
-    caracteristicas: String;
+    nome: string;
+    caracteristicas: string;
     peso: number;
     ameacado: boolean;
 }
 
-server.post<{ Body: Mamifero }>('/inserir', (request, reply) => {
+server.post<{ Body: Mamifero }>('/inserir', async (request, reply) => {
     const { nome, caracteristicas, peso, ameacado } = request.body;
 
-    const mamifero = prisma.leopardoDasNeves.create({
+    const mamifero = await prisma.leopardoDasNeves.create({
         data: {
             nome,
             caracteristicas,
@@ -36,6 +36,31 @@ server.post<{ Body: Mamifero }>('/inserir', (request, reply) => {
     });
     return reply.status(201).send(mamifero);
 });
+
+server.get<{ Body: Mamifero }>('/inserir/:nome', async (request, reply) => {
+    const { nome } = request.body;
+
+    const mamifero = await prisma.leopardoDasNeves.findMany({
+        where: {
+            nome: {
+              contains: nome
+            }
+          }
+        })
+        reply.send(mamifero)
+    });
+
+    server.get('/buscar/:nome', async(req: any, reply : any) => {
+        let nome = req.params.nome
+        let mamifero = await prisma.leopardoDasNeves.findMany({
+          where: {
+            nome: {
+              contains: nome
+            }
+          }
+        })
+        reply.send(mamifero)
+      })
 
 const port: any = process.env.PORT;
 

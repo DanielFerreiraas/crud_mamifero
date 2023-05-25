@@ -14,9 +14,9 @@ server.register(cors_1.default, {});
 server.get('/', (request, reply) => {
     return "Servidor Exemplo no ar";
 });
-server.post('/inserir', (request, reply) => {
+server.post('/inserir', async (request, reply) => {
     const { nome, caracteristicas, peso, ameacado } = request.body;
-    const mamifero = prisma.leopardoDasNeves.create({
+    const mamifero = await prisma.leopardoDasNeves.create({
         data: {
             nome,
             caracteristicas,
@@ -26,17 +26,28 @@ server.post('/inserir', (request, reply) => {
     });
     return reply.status(201).send(mamifero);
 });
-// server.get('/pesquisar', async (request: any, reply: any) => {
-//     const nomeDoMamifero = request.body.nomeDoMamifero;
-//     const leopardoDasNeves = await prisma.leopardoDasNeves.findMany({
-//         where:{
-//             nome: {
-//                 contains: nomeDoMamifero
-//             }
-//         }
-//     })
-//     reply.send(leopardoDasNeves)
-// })
+server.get('/inserir/:nome', async (request, reply) => {
+    const { nome } = request.body;
+    const mamifero = await prisma.leopardoDasNeves.findMany({
+        where: {
+            nome: {
+                contains: nome
+            }
+        }
+    });
+    reply.send(mamifero);
+});
+server.get('/buscar/:nome', async (req, reply) => {
+    let nome = req.params.nome;
+    let mamifero = await prisma.leopardoDasNeves.findMany({
+        where: {
+            nome: {
+                contains: nome
+            }
+        }
+    });
+    reply.send(mamifero);
+});
 const port = process.env.PORT;
 server.listen({ port }, (error, adress) => {
     if (error) {
