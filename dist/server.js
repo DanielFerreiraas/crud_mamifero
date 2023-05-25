@@ -12,7 +12,7 @@ const prisma = new client_1.PrismaClient();
 const server = (0, fastify_1.default)();
 server.register(cors_1.default, {});
 server.get('/', (request, reply) => {
-    return "Servidor Exemplo no ar";
+    return "O servidor está funcionado!";
 });
 server.post('/inserir', async (request, reply) => {
     const { nome, caracteristicas, peso, ameacado } = request.body;
@@ -26,18 +26,7 @@ server.post('/inserir', async (request, reply) => {
     });
     return reply.status(201).send(mamifero);
 });
-server.get('/inserir/:nome', async (request, reply) => {
-    const { nome } = request.body;
-    const mamifero = await prisma.leopardoDasNeves.findMany({
-        where: {
-            nome: {
-                contains: nome
-            }
-        }
-    });
-    reply.send(mamifero);
-});
-server.get('/pesquisar/:nome', async (request, reply) => {
+server.get('/selecionar/:nome', async (request, reply) => {
     const nome = request.params.nome;
     const mamifero = await prisma.leopardoDasNeves.findMany({
         where: {
@@ -46,11 +35,26 @@ server.get('/pesquisar/:nome', async (request, reply) => {
             }
         }
     });
-    reply.send(mamifero);
+    reply.status(200).send(mamifero);
 });
-server.get('/pesquisar/tudo', async (request, reply) => {
+server.get('/selecionar/todos', async (request, reply) => {
     const mamifero = await prisma.leopardoDasNeves.findMany();
-    reply.send(mamifero);
+    reply.status(200).send(mamifero);
+});
+server.put('/editar/:nome', async (request, reply) => {
+    const nome = request.params.nome;
+    const mamifero = await prisma.leopardoDasNeves.update({
+        where: {
+            nome: nome
+        },
+        data: {
+            nome: request.body.nome,
+            caracteristicas: request.body.caracteristicas,
+            peso: request.body.peso,
+            ameacado: request.body.ameacado
+        }
+    });
+    reply.status(200).send(mamifero);
 });
 const port = process.env.PORT;
 server.listen({ port }, (error, adress) => {
@@ -59,6 +63,6 @@ server.listen({ port }, (error, adress) => {
         process.exit(1);
     }
     else {
-        console.log(`Servidor rodando em ${adress}`);
+        console.log(`Servidor executado em ${adress}`);
     }
 });

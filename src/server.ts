@@ -12,10 +12,6 @@ server.register(cors, {
 
 });
 
-server.get('/', (request, reply) => {
-    return "O servidor está funcionado com sucesso!";
-});
-
 interface Mamifero {
     nome: string;
     caracteristicas: string;
@@ -23,37 +19,57 @@ interface Mamifero {
     ameacado: boolean;
 }
 
-    server.post<{ Body: Mamifero }>('/inserir', async (request, reply) => {
-        
-        const { nome, caracteristicas, peso, ameacado } = request.body;
+server.get('/', (request, reply) => {
+    return "O servidor está funcionado!";
+});
 
-        const mamifero = await prisma.leopardoDasNeves.create({
-            data: {
-                nome,
-                caracteristicas,
-                peso,
-                ameacado,
-            }
-        });
-        return reply.status(201).send(mamifero);
+server.post<{ Body: Mamifero }>('/inserir', async (request, reply) => {
+
+    const { nome, caracteristicas, peso, ameacado } = request.body;
+
+    const mamifero = await prisma.leopardoDasNeves.create({
+        data: {
+            nome,
+            caracteristicas,
+            peso,
+            ameacado,
+        }
     });
+    return reply.status(201).send(mamifero);
+});
 
-    server.get('/pesquisar/:nome', async(request: any, reply : any) => {
-        const nome = request.params.nome;
-        const mamifero = await prisma.leopardoDasNeves.findMany({
-          where: {
+server.get('/selecionar/:nome', async (request: any, reply: any) => {
+    const nome = request.params.nome;
+    const mamifero = await prisma.leopardoDasNeves.findMany({
+        where: {
             nome: {
-              contains: nome
+                contains: nome
             }
-          }
-        });
-        reply.status(200).send(mamifero)
-      });
+        }
+    });
+    reply.status(200).send(mamifero)
+});
 
-      server.get('/pesquisar/todos', async(request, reply) => {
-        const mamifero = await prisma.leopardoDasNeves.findMany()
-        reply.status(200).send(mamifero)
-      });
+server.get('/selecionar/todos', async (request, reply) => {
+    const mamifero = await prisma.leopardoDasNeves.findMany()
+    reply.status(200).send(mamifero)
+});
+
+server.put('/editar/:nome', async (request: any, reply: any) => {
+    const nome = request.params.nome
+    const mamifero = await prisma.leopardoDasNeves.update({
+        where: {
+            nome: nome
+        },
+        data: {
+            nome: request.body.nome,
+            caracteristicas: request.body.caracteristicas,
+            peso: request.body.peso,
+            ameacado: request.body.ameacado
+        }
+    });
+    reply.status(200).send(mamifero)
+});
 
 const port: any = process.env.PORT;
 
@@ -62,6 +78,6 @@ server.listen({ port }, (error, adress) => {
         console.error(error);
         process.exit(1);
     } else {
-        console.log(`Servidor rodando em ${adress}`);
+        console.log(`Servidor executado em ${adress}`);
     }
 });
