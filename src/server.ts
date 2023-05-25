@@ -19,7 +19,7 @@ interface Mamifero {
     ameacado: boolean;
 }
 
-server.get('/', (request, reply) => {
+server.get('/', () => {
     return "O servidor está funcionado!";
 });
 
@@ -42,9 +42,7 @@ server.get('/selecionar/:nome', async (request: any, reply: any) => {
     const nome = request.params.nome;
     const mamifero = await prisma.leopardoDasNeves.findMany({
         where: {
-            nome: {
-                contains: nome
-            }
+            nome: nome
         }
     });
     reply.status(200).send(mamifero)
@@ -56,7 +54,7 @@ server.get('/selecionar/todos', async (request, reply) => {
 });
 
 server.put('/editar/:nome', async (request: any, reply: any) => {
-    const nome = request.params.nome
+    const nome = request.params.nome;
     const mamifero = await prisma.leopardoDasNeves.update({
         where: {
             nome: nome
@@ -69,6 +67,16 @@ server.put('/editar/:nome', async (request: any, reply: any) => {
         }
     });
     reply.status(200).send(mamifero)
+});
+
+server.delete('/deletar/:nome', async (request: any, reply: any) => {
+    const nome = request.params.nome;
+    await prisma.leopardoDasNeves.delete({
+        where: {
+            nome: nome
+        }
+    });
+    reply.status(204);
 });
 
 const port: any = process.env.PORT;

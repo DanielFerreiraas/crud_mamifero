@@ -11,7 +11,7 @@ dotenv_1.default.config();
 const prisma = new client_1.PrismaClient();
 const server = (0, fastify_1.default)();
 server.register(cors_1.default, {});
-server.get('/', (request, reply) => {
+server.get('/', () => {
     return "O servidor está funcionado!";
 });
 server.post('/inserir', async (request, reply) => {
@@ -30,9 +30,7 @@ server.get('/selecionar/:nome', async (request, reply) => {
     const nome = request.params.nome;
     const mamifero = await prisma.leopardoDasNeves.findMany({
         where: {
-            nome: {
-                contains: nome
-            }
+            nome: nome
         }
     });
     reply.status(200).send(mamifero);
@@ -55,6 +53,15 @@ server.put('/editar/:nome', async (request, reply) => {
         }
     });
     reply.status(200).send(mamifero);
+});
+server.delete('/deletar/:nome', async (request, reply) => {
+    const nome = request.params.nome;
+    await prisma.leopardoDasNeves.delete({
+        where: {
+            nome: nome
+        }
+    });
+    reply.status(204);
 });
 const port = process.env.PORT;
 server.listen({ port }, (error, adress) => {
